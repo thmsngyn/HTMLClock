@@ -1,0 +1,17 @@
+p {
+	font-family: "Arial";
+}
+
+.smallText {
+	font-size: 20px;
+}
+
+.largeText {
+	font-size: 50px;
+}
+
+body {
+	background-color: orange;
+	color: white;
+	text-align: center;
+}
