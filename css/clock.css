@@ -11,7 +11,27 @@ p {
 }
 
 body {
-	background-color: orange;
+	background-color: gray;
 	color: white;
 	text-align: center;
+}
+
+.cold {
+	color: #95A5A6;
+}
+
+.chilly {
+	color: #1ABC9C;
+}
+
+.nice {
+	color: #2980B9;
+}
+
+.warm {
+	color: #E67E22;
+}
+
+.hot {
+	color: #E74C3C;
 }
