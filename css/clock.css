@@ -11,27 +11,26 @@ p {
 }
 
 body {
-	background-color: gray;
 	color: white;
 	text-align: center;
 }
 
 .cold {
-	color: #95A5A6;
+	background-color: #95A5A6;
 }
 
 .chilly {
-	color: #1ABC9C;
+	background-color: #1ABC9C;
 }
 
 .nice {
-	color: #2980B9;
+	background-color: #2980B9;
 }
 
 .warm {
-	color: #E67E22;
+	background-color: #E67E22;
 }
 
 .hot {
-	color: #E74C3C;
+	background-color: #E74C3C;
 }
