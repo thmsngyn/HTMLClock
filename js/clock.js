@@ -1,3 +1,9 @@
+$(document).ready(function() {
+	getTime();
+	getTemp();
+	getAllAlarms();
+});
+
 function getTime() {
 	var clockElement = document.getElementById("time");
 	var date = new Date();
@@ -38,22 +44,60 @@ function getTemp() {
 	);
 }
 
+function getAllAlarms() {
+	Parse.initialize("6hPUirhRABNbFZE05GsiC0seoeeclDcBYlFN6hpe", "wYz6fLumch0WDVaj867jvVfo3Qs1eGpsYtTUJyDE");
+	
+	var AlarmObject = Parse.Object.extend("Alarm");
+    var query = new Parse.Query(AlarmObject);
+    
+    query.find({
+        success: function(results) {
+          for (var i = 0; i < results.length; i++) { 
+          	insertAlarm(results[i].get("time"), results[i].get("alarmName"), results[i].id);
+          }
+        }
+    });
+}
+
 function addAlarm() {
 	var hours = $('#hours option:selected').text();
     var mins = $('#mins option:selected').text();
     var ampm = $('#ampm option:selected').text();
+    var time = hours + ":" + mins + " " + ampm;
     var alarmName = $('#alarmName').val();
 
-	insertAlarm(hours, mins, ampm, alarmName);
-	hideAlarmPopup();
+	var AlarmObject = Parse.Object.extend("Alarm");
+    var alarmObject = new AlarmObject();
+
+    alarmObject.save({"time": time,"alarmName": alarmName}, {
+    	success: function(object) {
+            insertAlarm(time, alarmName, alarmObject.id);
+			hideAlarmPopup();
+       	}
+    });
 }
 
-function insertAlarm(hours, mins, ampm, alarmName) {
+function deleteAlarm(object) {
+    var AlarmObject = Parse.Object.extend("Alarm");
+    var query = new Parse.Query(AlarmObject);
+    
+    query.get(object.data.id, {
+        success: function(result) {
+           result.destroy({});
+           $('#' + object.data.id).remove();
+        }
+    });
+}
+
+function insertAlarm(time, alarmName, id) {
 	var newdiv = $('<div></div>');
-	
+	newdiv.attr('id', id);
+
 	newdiv.addClass('flexable');
-	newdiv.append("<div class='name'>" + alarmName + ":  </div>");
-	newdiv.append("<div class='time'>" + hours + ':' + mins + ' ' + ampm);
+	newdiv.append("<img src='img/SmallX.gif'></div>").click({id: id}, deleteAlarm);
+	newdiv.append("<div class='name'>" + " " + alarmName + ":  </div>");
+	newdiv.append("<div class='time'>" + " " + time + "</div>");
+
 
 	$("#alarms").append(newdiv);
 }
@@ -67,6 +111,3 @@ function showAlarmPopup() {
 	$('#mask').removeClass('hide');
 	$('#popup').removeClass('hide');
 }
-
-getTemp();
-getTime();
