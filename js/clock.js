@@ -4,6 +4,34 @@ $(document).ready(function() {
 	getAllAlarms();
 });
 
+function logout() {
+    gapi.auth.signOut();
+    $("#alarms").html("");
+    location.reload();
+}
+
+function signinCallback(authResult) {
+    if (authResult['status']['signed_in']) {
+        gapi.client.load('plus', 'v1', apiClientLoaded);
+      } else {
+        console.log('Sign-in state: ' + authResult['error']);
+      }
+}
+
+function apiClientLoaded() {
+    var email;
+    var request = gapi.client.plus.people.get({'userId' : 'me'});
+
+    request.execute(function(result) {
+        email = result.emails[0].value;
+        $("#google-signin").html(email);
+        $("#google-signin").attr("onclick", "logout()");
+        $("#add").removeAttr("id");
+        $("#alarms").html("");
+        getAllAlarms(email);
+    });
+}
+
 function getTime() {
 	var clockElement = document.getElementById("time");
 	var date = new Date();
@@ -44,12 +72,12 @@ function getTemp() {
 	);
 }
 
-function getAllAlarms() {
+function getAllAlarms(email) {
 	Parse.initialize("6hPUirhRABNbFZE05GsiC0seoeeclDcBYlFN6hpe", "wYz6fLumch0WDVaj867jvVfo3Qs1eGpsYtTUJyDE");
 	
 	var AlarmObject = Parse.Object.extend("Alarm");
     var query = new Parse.Query(AlarmObject);
-    
+    query.equalTo("email", email);
     query.find({
         success: function(results) {
           for (var i = 0; i < results.length; i++) { 
