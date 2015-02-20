@@ -1,34 +1,28 @@
+var name = "";
+var userId = -1;
+
 $(document).ready(function() {
 	getTime();
 	getTemp();
-	getAllAlarms();
 });
-
-function logout() {
-    gapi.auth.signOut();
-    $("#alarms").html("");
-    location.reload();
-}
 
 function signinCallback(authResult) {
     if (authResult['status']['signed_in']) {
-        gapi.client.load('plus', 'v1', apiClientLoaded);
+    	document.getElementById('signinButton').setAttribute('style', 'display: none');
+        gapi.client.load('plus', 'v1', loaded);
       } else {
         console.log('Sign-in state: ' + authResult['error']);
+        name = "";
       }
 }
 
-function apiClientLoaded() {
-    var email;
+function loaded() {
     var request = gapi.client.plus.people.get({'userId' : 'me'});
-
     request.execute(function(result) {
-        email = result.emails[0].value;
-        $("#google-signin").html(email);
-        $("#google-signin").attr("onclick", "logout()");
-        $("#add").removeAttr("id");
-        $("#alarms").html("");
-        getAllAlarms(email);
+        name = result.displayName;
+        userId = result.id;
+        $(".smallText").after("<h2> Welcome " + name + "!</h2>");
+        $(this).load(getAllAlarms(userId));
     });
 }
 
@@ -72,17 +66,17 @@ function getTemp() {
 	);
 }
 
-function getAllAlarms(email) {
+function getAllAlarms(userId) {
 	Parse.initialize("6hPUirhRABNbFZE05GsiC0seoeeclDcBYlFN6hpe", "wYz6fLumch0WDVaj867jvVfo3Qs1eGpsYtTUJyDE");
 	
 	var AlarmObject = Parse.Object.extend("Alarm");
     var query = new Parse.Query(AlarmObject);
-    query.equalTo("email", email);
     query.find({
         success: function(results) {
-          for (var i = 0; i < results.length; i++) { 
-          	insertAlarm(results[i].get("time"), results[i].get("alarmName"), results[i].id);
-          }
+        	for (var i = 0; i < results.length; i++) { 
+          		if (userId == results[i]["attributes"]["user"])
+          			insertAlarm(results[i].get("time"), results[i].get("alarmName"), results[i].id);
+          	}
         }
     });
 }
@@ -97,7 +91,7 @@ function addAlarm() {
 	var AlarmObject = Parse.Object.extend("Alarm");
     var alarmObject = new AlarmObject();
 
-    alarmObject.save({"time": time,"alarmName": alarmName}, {
+    alarmObject.save({"time": time,"alarmName": alarmName, "user": userId}, {
     	success: function(object) {
             insertAlarm(time, alarmName, alarmObject.id);
 			hideAlarmPopup();
