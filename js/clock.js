@@ -1,5 +1,5 @@
-var name = "";
 var userId = -1;
+var name = "";
 
 $(document).ready(function() {
 	getTime();
