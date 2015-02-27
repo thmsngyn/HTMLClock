@@ -93,6 +93,7 @@ function addAlarm() {
 
     alarmObject.save({"time": time,"alarmName": alarmName, "user": userId}, {
     	success: function(object) {
+    		ga('send', 'event', 'Alarm', 'Add');
             insertAlarm(time, alarmName, alarmObject.id);
 			hideAlarmPopup();
        	}
@@ -106,6 +107,7 @@ function deleteAlarm(object) {
     query.get(object.data.id, {
         success: function(result) {
            result.destroy({});
+           ga('send', 'event', 'Alarm', 'Delete');
            $('#' + object.data.id).remove();
         }
     });
